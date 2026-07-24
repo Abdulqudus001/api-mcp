@@ -46,9 +46,12 @@ server.addTool({
 // });
 
 
-// server.start({
-//   transportType: "httpStream",
-//   httpStream: {
-//     port: 8080, // listen on 0.0.0.0 in production
-//   },
-// });
+server.start({
+  transportType: "httpStream",
+  httpStream: {
+    port: 8080, // listen on 0.0.0.0 in production
+    // Avoid session-id 400s with VS Code / other HTTP clients
+    stateless: true,
+    enableJsonResponse: true,
+  },
+});
