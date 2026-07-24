@@ -1,10 +1,15 @@
-import { sql } from "../db/client.js";
+import { getDb } from "../db/client.js";
 
 export async function login(email: string, password: string) {
-  const rows = await sql`
-    SELECT id, name, email, created_at
-    FROM users
-    WHERE email = ${email} AND password = ${password}
-  `;
-  return rows[0] ?? null;
+  const db = await getDb();
+  const user = db.data.users.find(
+    (u) => u.email === email && u.password === password
+  );
+
+  if (!user) {
+    return null;
+  }
+
+  const { password: _password, ...publicUser } = user;
+  return publicUser;
 }

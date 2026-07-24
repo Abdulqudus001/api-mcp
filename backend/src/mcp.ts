@@ -1,4 +1,4 @@
-// Load DATABASE_URL and other vars from the .env file
+// Load PORT and other vars from the .env file
 import "dotenv/config";
 
 // FastMCP = framework for building an MCP server

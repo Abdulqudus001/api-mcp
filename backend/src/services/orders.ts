@@ -1,44 +1,64 @@
-import { sql } from "../db/client.js";
+import { getDb, nextId } from "../db/client.js";
 
 export async function listOrders() {
-  return sql`
-    SELECT
-      o.id,
-      o.quantity,
-      o.created_at,
-      u.id AS user_id,
-      u.name AS user_name,
-      p.id AS product_id,
-      p.name AS product_name,
-      p.price AS product_price
-    FROM orders o
-    JOIN users u ON u.id = o.user_id
-    JOIN products p ON p.id = o.product_id
-    ORDER BY o.id
-  `;
+  const db = await getDb();
+
+  return db.data.orders
+    .slice()
+    .sort((a, b) => a.id - b.id)
+    .map((order) => {
+      const user = db.data.users.find((u) => u.id === order.user_id);
+      const product = db.data.products.find((p) => p.id === order.product_id);
+
+      return {
+        id: order.id,
+        quantity: order.quantity,
+        created_at: order.created_at,
+        user_id: user?.id,
+        user_name: user?.name,
+        product_id: product?.id,
+        product_name: product?.name,
+        product_price: product?.price,
+      };
+    });
 }
 
 export async function getOrdersByUserId(userId: number) {
-  return sql`
-    SELECT
-      o.id,
-      o.quantity,
-      o.created_at,
-      p.id AS product_id,
-      p.name AS product_name,
-      p.price AS product_price
-    FROM orders o
-    JOIN products p ON p.id = o.product_id
-    WHERE o.user_id = ${userId}
-    ORDER BY o.id
-  `;
+  const db = await getDb();
+
+  return db.data.orders
+    .filter((order) => order.user_id === userId)
+    .sort((a, b) => a.id - b.id)
+    .map((order) => {
+      const product = db.data.products.find((p) => p.id === order.product_id);
+
+      return {
+        id: order.id,
+        quantity: order.quantity,
+        created_at: order.created_at,
+        product_id: product?.id,
+        product_name: product?.name,
+        product_price: product?.price,
+      };
+    });
 }
 
-export async function createOrder(userId: number, productId: number, quantity: number) {
-  const rows = await sql`
-    INSERT INTO orders (user_id, product_id, quantity)
-    VALUES (${userId}, ${productId}, ${quantity})
-    RETURNING id, user_id, product_id, quantity, created_at
-  `;
-  return rows[0];
+export async function createOrder(
+  userId: number,
+  productId: number,
+  quantity: number
+) {
+  const db = await getDb();
+  const order = {
+    id: nextId(db.data.orders),
+    user_id: userId,
+    product_id: productId,
+    quantity,
+    created_at: new Date().toISOString(),
+  };
+
+  db.data.orders.push(order);
+  await db.write();
+
+  return order;
 }

@@ -1,27 +1,36 @@
-import { sql } from "../db/client.js";
+import { getDb, nextId } from "../db/client.js";
+
+function withoutPassword<T extends { password: string }>(user: T) {
+  const { password: _password, ...publicUser } = user;
+  return publicUser;
+}
 
 export async function listUsers() {
-  return sql`
-    SELECT id, name, email, created_at
-    FROM users
-    ORDER BY id
-  `;
+  const db = await getDb();
+  return db.data.users
+    .slice()
+    .sort((a, b) => a.id - b.id)
+    .map(withoutPassword);
 }
 
 export async function getUserById(id: number) {
-  const rows = await sql`
-    SELECT id, name, email, created_at
-    FROM users
-    WHERE id = ${id}
-  `;
-  return rows[0] ?? null;
+  const db = await getDb();
+  const user = db.data.users.find((u) => u.id === id);
+  return user ? withoutPassword(user) : null;
 }
 
 export async function createUser(name: string, email: string, password: string) {
-  const rows = await sql`
-    INSERT INTO users (name, email, password)
-    VALUES (${name}, ${email}, ${password})
-    RETURNING id, name, email, created_at
-  `;
-  return rows[0];
+  const db = await getDb();
+  const user = {
+    id: nextId(db.data.users),
+    name,
+    email,
+    password,
+    created_at: new Date().toISOString(),
+  };
+
+  db.data.users.push(user);
+  await db.write();
+
+  return withoutPassword(user);
 }

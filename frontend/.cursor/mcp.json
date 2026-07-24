@@ -27,7 +27,7 @@
   //       "mcp"
   //       // cursor pretty much runs pnpm --dir ../backend mcp
   //     ],
-  //     // Load DATABASE_URL and other vars from the backend .env into the process
+  //     // Optional: load PORT and other vars from the backend .env into the process
   //     "envFile": "${workspaceFolder}/../backend/.env"
   //   }
   // }

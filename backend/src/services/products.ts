@@ -1,20 +1,13 @@
-import { sql } from "../db/client.js";
+import { getDb, nextId } from "../db/client.js";
 
 export async function listProducts() {
-  return sql`
-    SELECT id, name, description, price, stock, created_at
-    FROM products
-    ORDER BY id
-  `;
+  const db = await getDb();
+  return db.data.products.slice().sort((a, b) => a.id - b.id);
 }
 
 export async function getProductById(id: number) {
-  const rows = await sql`
-    SELECT id, name, description, price, stock, created_at
-    FROM products
-    WHERE id = ${id}
-  `;
-  return rows[0] ?? null;
+  const db = await getDb();
+  return db.data.products.find((p) => p.id === id) ?? null;
 }
 
 export async function createProduct(
@@ -23,20 +16,31 @@ export async function createProduct(
   price: number,
   stock: number
 ) {
-  const rows = await sql`
-    INSERT INTO products (name, description, price, stock)
-    VALUES (${name}, ${description}, ${price}, ${stock})
-    RETURNING id, name, description, price, stock, created_at
-  `;
-  return rows[0];
+  const db = await getDb();
+  const product = {
+    id: nextId(db.data.products),
+    name,
+    description,
+    price,
+    stock,
+    created_at: new Date().toISOString(),
+  };
+
+  db.data.products.push(product);
+  await db.write();
+
+  return product;
 }
 
 export async function searchProducts(query: string) {
-  const pattern = `%${query}%`;
-  return sql`
-    SELECT id, name, description, price, stock, created_at
-    FROM products
-    WHERE name ILIKE ${pattern} OR description ILIKE ${pattern}
-    ORDER BY id
-  `;
+  const db = await getDb();
+  const needle = query.toLowerCase();
+
+  return db.data.products
+    .filter(
+      (p) =>
+        p.name.toLowerCase().includes(needle) ||
+        p.description.toLowerCase().includes(needle)
+    )
+    .sort((a, b) => a.id - b.id);
 }
