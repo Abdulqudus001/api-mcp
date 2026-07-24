@@ -1,0 +1,34 @@
+{
+  // // Top-level map of MCP servers Cursor should connect to for this project
+  // "mcpServers": {
+  //   // Server id shown in Cursor Settings → Tools & MCP
+  //   "workshop-api": {
+  //     // HTTP Streamable endpoint from backend FastMCP (transportType: "httpStream")
+  //     // Start the server first: pnpm --dir ../backend mcp
+  //     "url": "http://localhost:8080/mcp"
+  //   }
+  // }
+
+  // // Top-level map of MCP servers Cursor should start for this project
+  // "mcpServers": {
+  //   // Server id shown in Cursor Settings → Tools & MCP
+  //   "workshop-api": {
+  //     // Use stdio: Cursor spawns a local process and talks over stdin/stdout
+  //     "type": "stdio",
+  //     // Executable used to launch the MCP server
+  //     "command": "pnpm",
+  //     // Arguments passed to pnpm
+  //     "args": [
+  //       // Run the script in another directory (the backend package)
+  //       "--dir",
+  //       // Path to the backend relative to this frontend workspace root
+  //       "${workspaceFolder}/../backend",
+  //       // Runs the backend "mcp" script (tsx src/mcp.ts)
+  //       "mcp"
+  //       // cursor pretty much runs pnpm --dir ../backend mcp
+  //     ],
+  //     // Load DATABASE_URL and other vars from the backend .env into the process
+  //     "envFile": "${workspaceFolder}/../backend/.env"
+  //   }
+  // }
+}
