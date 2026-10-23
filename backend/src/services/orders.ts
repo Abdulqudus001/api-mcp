@@ -1,4 +1,4 @@
-import { getDb, nextId } from "../db/client.js";
+import { getDb } from "../db/client.js";
 
 export async function listOrders() {
   const db = await getDb();
@@ -7,8 +7,8 @@ export async function listOrders() {
     .slice()
     .sort((a, b) => a.id - b.id)
     .map((order) => {
-      const user = db.data.users.find((u) => u.id === order.user_id);
-      const product = db.data.products.find((p) => p.id === order.product_id);
+      const user = db.data.users.find((item) => item.id === order.user_id);
+      const product = db.data.products.find((item) => item.id === order.product_id);
 
       return {
         id: order.id,
@@ -30,7 +30,7 @@ export async function getOrdersByUserId(userId: number) {
     .filter((order) => order.user_id === userId)
     .sort((a, b) => a.id - b.id)
     .map((order) => {
-      const product = db.data.products.find((p) => p.id === order.product_id);
+      const product = db.data.products.find((item) => item.id === order.product_id);
 
       return {
         id: order.id,
@@ -43,22 +43,26 @@ export async function getOrdersByUserId(userId: number) {
     });
 }
 
-export async function createOrder(
-  userId: number,
-  productId: number,
-  quantity: number
-) {
+export async function listProductsForUser(userId: number) {
   const db = await getDb();
-  const order = {
-    id: nextId(db.data.orders),
-    user_id: userId,
-    product_id: productId,
-    quantity,
-    created_at: new Date().toISOString(),
-  };
+  const user = db.data.users.find((item) => item.id === userId);
+  if (!user) return null;
 
-  db.data.orders.push(order);
-  await db.write();
+  return db.data.orders
+    .filter((order) => order.user_id === userId)
+    .sort((a, b) => a.id - b.id)
+    .flatMap((order) => {
+      const product = db.data.products.find((item) => item.id === order.product_id);
+      if (!product) return [];
 
-  return order;
+      return [
+        {
+          id: product.id,
+          name: product.name,
+          description: product.description,
+          price: product.price,
+          quantity: order.quantity,
+        },
+      ];
+    });
 }

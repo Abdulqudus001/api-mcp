@@ -15,9 +15,5 @@ export async function getDb() {
   return dbPromise;
 }
 
-export function nextId(items: { id: number }[]): number {
-  return items.reduce((max, item) => Math.max(max, item.id), 0) + 1;
-}
-
 export type { DbSchema };
 export type { User, Product, Order } from "./seed.js";

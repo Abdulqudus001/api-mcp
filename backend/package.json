@@ -1,7 +1,7 @@
 {
-  "name": "workshop-api",
+  "name": "api-mcp",
   "version": "1.0.0",
-  "description": "Simple Express API for MCP workshop demo",
+  "description": "DevFest Maiduguri API for demonstrating MCP tools",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {

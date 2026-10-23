@@ -2,7 +2,7 @@ export type User = {
   id: number;
   name: string;
   email: string;
-  password: string;
+  expires_at: string;
   created_at: string;
 };
 
@@ -37,21 +37,35 @@ export const seedData: DbSchema = {
       id: 1,
       name: "Ada Lovelace",
       email: "ada@example.com",
-      password: "password123",
+      expires_at: "2027-12-31T00:00:00.000Z",
       created_at: createdAt,
     },
     {
       id: 2,
       name: "Alan Turing",
       email: "alan@example.com",
-      password: "password123",
+      expires_at: "2025-06-01T00:00:00.000Z",
       created_at: createdAt,
     },
     {
       id: 3,
       name: "Grace Hopper",
       email: "grace@example.com",
-      password: "password123",
+      expires_at: "2027-03-15T00:00:00.000Z",
+      created_at: createdAt,
+    },
+    {
+      id: 4,
+      name: "Katherine Johnson",
+      email: "katherine@example.com",
+      expires_at: "2026-12-01T00:00:00.000Z",
+      created_at: createdAt,
+    },
+    {
+      id: 5,
+      name: "Margaret Hamilton",
+      email: "margaret@example.com",
+      expires_at: "2024-11-01T00:00:00.000Z",
       created_at: createdAt,
     },
   ],
@@ -75,7 +89,7 @@ export const seedData: DbSchema = {
     {
       id: 3,
       name: "Notebook",
-      description: "Dotted pages for workshop notes",
+      description: "Dotted pages for session notes",
       price: 12.5,
       stock: 100,
       created_at: createdAt,
